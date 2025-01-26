@@ -1,0 +1,219 @@
+definitions:
+  controllers.LoginInput:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  controllers.RegisterInput:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
+info:
+  contact: {}
+  description: API documentation for Sidita Tes
+  title: Sidita Tes API
+  version: "1.0"
+paths:
+  /api/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login User
+      parameters:
+      - description: Input Data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.LoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Login User
+      tags:
+      - Auth
+  /api/auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register User
+      parameters:
+      - description: Input Data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.RegisterInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Register User
+      tags:
+      - Auth
+  /api/me:
+    get:
+      consumes:
+      - application/json
+      description: Get details of the currently authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Current User
+      tags:
+      - Auth
+  /api/project/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get Project By ID
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get Project By ID
+      tags:
+      - Project
+  /api/project/get:
+    get:
+      consumes:
+      - application/json
+      description: Get Projects
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get Projects
+      tags:
+      - Project
+  /api/worklog/{uid}:
+    get:
+      consumes:
+      - application/json
+      description: Get Worklogs By User ID
+      parameters:
+      - description: User ID
+        in: path
+        name: uid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get Worklogs By User ID
+      tags:
+      - Worklog
+  /api/worklog/get:
+    get:
+      consumes:
+      - application/json
+      description: Get Worklogs
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get Worklogs
+      tags:
+      - Worklog
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
