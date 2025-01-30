@@ -7,9 +7,9 @@ import (
 )
 
 type Project struct {
-	ID       uint   `gorm:"primaryKey" json:"id"`
-	Name     string `gorm:"size:255;not null" json:"name"`
-	Location string `gorm:"size:255;not null" json:"location"`
+	ID        uint      `gorm:"primaryKey" json:"id"`
+	Name      string    `gorm:"size:255;not null" json:"name"`
+	Location  string    `gorm:"size:255;not null" json:"location"`
 	CreatedAt time.Time `gorm:"autoCreateTime" json:"-"`
 	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"-"`
 }

@@ -76,7 +76,7 @@ func (u *User) SaveUser() (*User, error) {
 	return u, nil
 }
 
-func GetUserByID(uid uint) (User,error) {
+func GetUserByID(uid int) (User,error) {
 
 	var u User
 
@@ -87,17 +87,24 @@ func GetUserByID(uid uint) (User,error) {
 	return u,nil
 }
 
-func GetUsers() ([]User,error) {
+func GetUsers(limit, offset int) ([]User,error) {
 
 	var users []User
 
-	if err := config.DB.Find(&users).Error; err != nil {
+	if err := config.DB.Limit(limit).Offset(offset).Find(&users).Error; err != nil {
 		return users, errors.New("failed to get users")
 	}
 
-	if len(users) == 0 {
-		return users, errors.New("no users found")
+	return users, nil
+}
+
+func CountAllUsers() (int64, error) {
+	var count int64
+
+	err := config.DB.Model(&User{}).Count(&count).Error
+	if err != nil {
+		return 0, err
 	}
 
-	return users, nil
+	return count, nil
 }

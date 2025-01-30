@@ -65,3 +65,22 @@ func GetProjectByID(c *gin.Context) {
 // 	}
 // 	utils.SendResponse(c, http.StatusCreated, "Project created", project)
 // }
+
+func GetAllProjectsRecap(c *gin.Context) {
+	var projects []model.Project
+	var worklogs []model.Worklog
+
+	worklogs, err := model.GetWorklogsNotPaginated()
+	
+	helper.SendResponse(c, http.StatusOK, "Ok", worklogs)
+	for _, worklog := range worklogs {
+		if worklog.Project.Name != "" {
+			projects = append(projects, worklog.Project)
+		}
+	}
+	if projects, err = model.GetProjects(); err != nil {
+		helper.SendResponse(c, http.StatusInternalServerError, "Failed to get projects", nil)
+		return
+	}
+	helper.SendResponse(c, http.StatusOK, "Projects fetched successfully", projects)
+}

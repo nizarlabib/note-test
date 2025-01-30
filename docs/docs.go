@@ -216,14 +216,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/worklog/get": {
+        "/api/user/get": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get Worklogs",
+                "description": "Get Users",
                 "consumes": [
                     "application/json"
                 ],
@@ -231,9 +231,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Worklog"
+                    "User"
                 ],
-                "summary": "Get Worklogs",
+                "summary": "Get Users",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -252,7 +252,149 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/worklog/{uid}": {
+        "/api/worklog/add": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Add New Worklog",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Worklog"
+                ],
+                "summary": "Add Worklog",
+                "parameters": [
+                    {
+                        "description": "Input Data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.WorkLogInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/worklog/delete/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Delete Worklog",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Worklog"
+                ],
+                "summary": "Delete Worklog",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Worklog ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/worklog/get": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get Worklogs",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Worklog"
+                ],
+                "summary": "Get Worklogs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/worklog/get/user/{user_id}": {
             "get": {
                 "security": [
                     {
@@ -272,11 +414,23 @@ const docTemplate = `{
                 "summary": "Get Worklogs By User ID",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "User ID",
-                        "name": "uid",
+                        "name": "user_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -329,6 +483,23 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "controllers.WorkLogInput": {
+            "type": "object",
+            "properties": {
+                "hours_worked": {
+                    "type": "integer"
+                },
+                "project_id": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "work_date": {
                     "type": "string"
                 }
             }

@@ -117,7 +117,7 @@ func CurrentUser(c *gin.Context){
 		return
 	}
 	
-	u,err := models.GetUserByID(user_id)
+	u,err := models.GetUserByID(int(user_id))
 	
 	if err != nil {
 		helper.SendResponse(c, http.StatusBadRequest, err.Error(), nil)

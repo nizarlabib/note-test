@@ -22,6 +22,17 @@ definitions:
     - name
     - password
     type: object
+  controllers.WorkLogInput:
+    properties:
+      hours_worked:
+        type: integer
+      project_id:
+        type: integer
+      user_id:
+        type: integer
+      work_date:
+        type: string
+    type: object
 info:
   contact: {}
   description: API documentation for Sidita Tes
@@ -159,7 +170,121 @@ paths:
       summary: Get Projects
       tags:
       - Project
-  /api/worklog/{uid}:
+  /api/user/get:
+    get:
+      consumes:
+      - application/json
+      description: Get Users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get Users
+      tags:
+      - User
+  /api/worklog/add:
+    post:
+      consumes:
+      - application/json
+      description: Add New Worklog
+      parameters:
+      - description: Input Data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.WorkLogInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Add Worklog
+      tags:
+      - Worklog
+  /api/worklog/delete/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Worklog
+      parameters:
+      - description: Worklog ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete Worklog
+      tags:
+      - Worklog
+  /api/worklog/get:
+    get:
+      consumes:
+      - application/json
+      description: Get Worklogs
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get Worklogs
+      tags:
+      - Worklog
+  /api/worklog/get/user/{user_id}:
     get:
       consumes:
       - application/json
@@ -167,8 +292,16 @@ paths:
       parameters:
       - description: User ID
         in: path
-        name: uid
+        name: user_id
         required: true
+        type: integer
+      - description: Page number
+        in: query
+        name: page
+        type: string
+      - description: Limit
+        in: query
+        name: limit
         type: string
       produces:
       - application/json
@@ -186,29 +319,6 @@ paths:
       security:
       - BearerAuth: []
       summary: Get Worklogs By User ID
-      tags:
-      - Worklog
-  /api/worklog/get:
-    get:
-      consumes:
-      - application/json
-      description: Get Worklogs
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get Worklogs
       tags:
       - Worklog
 securityDefinitions:

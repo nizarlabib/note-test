@@ -7,6 +7,7 @@ import (
 	_ "sidita-be/docs"
 
 	"github.com/gin-gonic/gin"
+	// cors "github.com/rs/cors/wrapper/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -24,6 +25,8 @@ func main() {
 	config.ConnectDB()
 
 	r := gin.Default()
+
+	// r.Use(cors.Default())
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
