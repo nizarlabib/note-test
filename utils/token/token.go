@@ -2,18 +2,23 @@ package token
 
 import (
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func GenerateToken(user_id uint) (string, error) {
 
-	token_lifespan,err := strconv.Atoi(os.Getenv("TOKEN_HOUR_LIFESPAN"))
+	env, err := godotenv.Read(".env")
+	if err != nil {
+		return "",err
+	}
+
+	token_lifespan,err := strconv.Atoi(env["TOKEN_HOUR_LIFESPAN"])
 
 	if err != nil {
 		return "",err
@@ -25,17 +30,21 @@ func GenerateToken(user_id uint) (string, error) {
 	claims["exp"] = time.Now().Add(time.Hour * time.Duration(token_lifespan)).Unix()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	return token.SignedString([]byte(os.Getenv("API_SECRET")))
+	return token.SignedString([]byte(env["API_SECRET"]))
 
 }
 
 func TokenValid(c *gin.Context) error {
+	env, err := godotenv.Read(".env")
+	if err != nil {
+		return err
+	}
 	tokenString := ExtractToken(c)
-	_, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	_, err = jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(os.Getenv("API_SECRET")), nil
+		return []byte(env["API_SECRET"]), nil
 	})
 	if err != nil {
 		return err
@@ -56,13 +65,16 @@ func ExtractToken(c *gin.Context) string {
 }
 
 func ExtractTokenID(c *gin.Context) (uint, error) {
-
+	env, err := godotenv.Read(".env")
+	if err != nil {
+		return 0, err
+	}
 	tokenString := ExtractToken(c)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(os.Getenv("API_SECRET")), nil
+		return []byte(env["API_SECRET"]), nil
 	})
 	if err != nil {
 		return 0, err
