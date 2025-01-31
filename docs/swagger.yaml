@@ -170,6 +170,35 @@ paths:
       summary: Get Projects
       tags:
       - Project
+  /api/user/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get User By ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get User By ID
+      tags:
+      - User
   /api/user/get:
     get:
       consumes:
@@ -191,6 +220,58 @@ paths:
       security:
       - BearerAuth: []
       summary: Get Users
+      tags:
+      - User
+  /api/user/get/absent/recap:
+    get:
+      consumes:
+      - application/json
+      description: Get User Absent Recap
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get User Absent Recap
+      tags:
+      - User
+  /api/user/get/absent/recap/byuser/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get User Absent Recap By User ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get User Absent Recap By User ID
       tags:
       - User
   /api/worklog/add:
@@ -319,6 +400,35 @@ paths:
       security:
       - BearerAuth: []
       summary: Get Worklogs By User ID
+      tags:
+      - Worklog
+  /api/worklog/get/user/byproject/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get Total User Hours Worked By Project
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get Total User Hours Worked By Project
       tags:
       - Worklog
 securityDefinitions:

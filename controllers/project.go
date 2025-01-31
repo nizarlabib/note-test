@@ -19,11 +19,13 @@ import (
 // @Failure 400 {object} map[string]interface{}
 // @Router /api/project/get [get]
 func GetProjects(c *gin.Context) {
+	
 	projects, err := model.GetProjects()
 	if err != nil {
 		helper.SendResponse(c, http.StatusInternalServerError, "Failed to get projects", nil)
 		return
 	}
+
 	helper.SendResponse(c, http.StatusOK, "Projects found", projects)
 }
 
@@ -48,39 +50,4 @@ func GetProjectByID(c *gin.Context) {
 	}
 
 	helper.SendResponse(c, http.StatusOK, "Project found", project)
-}
-
-
-// func CreateProject(c *gin.Context) {
-// 	var project model.Project
-// 	if err := c.ShouldBindJSON(&project); err != nil {
-// 		utils.SendResponse(c, http.StatusBadRequest, "Invalid input", nil)
-// 		return
-// 	}
-
-// 	err := model.CreateProject(&project)
-// 	if err != nil {
-// 		utils.SendResponse(c, http.StatusInternalServerError, "Failed to create project", nil)
-// 		return
-// 	}
-// 	utils.SendResponse(c, http.StatusCreated, "Project created", project)
-// }
-
-func GetAllProjectsRecap(c *gin.Context) {
-	var projects []model.Project
-	var worklogs []model.Worklog
-
-	worklogs, err := model.GetWorklogsNotPaginated()
-	
-	helper.SendResponse(c, http.StatusOK, "Ok", worklogs)
-	for _, worklog := range worklogs {
-		if worklog.Project.Name != "" {
-			projects = append(projects, worklog.Project)
-		}
-	}
-	if projects, err = model.GetProjects(); err != nil {
-		helper.SendResponse(c, http.StatusInternalServerError, "Failed to get projects", nil)
-		return
-	}
-	helper.SendResponse(c, http.StatusOK, "Projects fetched successfully", projects)
 }

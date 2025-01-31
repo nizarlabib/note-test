@@ -140,6 +140,15 @@ func InsertWorklog(c *gin.Context) {
 		helper.SendResponse(c, http.StatusBadRequest, "Invalid hours worked", nil)
 		return
 	}
+	
+	totalHoursInDate, err := model.GetTotalWorklogsByUserIdAndDate(int(input.UserID), input.WorkDate)
+	if err == nil {
+		totalHoursInDate = totalHoursInDate + input.HoursWorked
+		if totalHoursInDate > 8 {
+			helper.SendResponse(c, http.StatusBadRequest, "Worklog exceeds 8 hours, pick another date", nil)
+			return
+		}
+	}
 
 	w := model.Worklog{}
 
@@ -186,6 +195,17 @@ func DeleteWorklog(c *gin.Context) {
 	helper.SendResponse(c, http.StatusOK, "Worklog deleted", nil)
 }
 
+// GetTotalUserHoursWorkedByProject godoc
+// @Summary Get Total User Hours Worked By Project
+// @Description Get Total User Hours Worked By Project
+// @Tags Worklog
+// @Accept json
+// @Produce json
+// @Param user_id path int true "User ID"
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Router /api/worklog/get/user/byproject/{user_id} [get]
 func GetTotalUserHoursWorkedByProject(c *gin.Context) {
 	idParam := c.Param("user_id")
 

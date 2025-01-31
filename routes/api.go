@@ -25,7 +25,6 @@ func ApiRoutes(r *gin.Engine) {
 			auth.POST("/login", controllers.Login)
 		}
 
-		api.GET("/project/recap", controllers.GetAllProjectsRecap)
 		api.Use(middlewares.JwtAuthMiddleware())
 
 		api.GET("/me", controllers.CurrentUser)
@@ -34,14 +33,14 @@ func ApiRoutes(r *gin.Engine) {
 		{
 			user.GET("/get", controllers.GetUsers)
 			user.GET("/:id", controllers.GetUserByID)
+			user.GET("/get/absent/recap", controllers.GetUserAbsentRecap)
+			user.GET("/get/absent/recap/byuser/:id", controllers.GetUserAbsentRecapByUID)
 		}
 
 		project := api.Group("/project")
 		{
-			// project.POST("/add", controllers.InsertProject)
 			project.GET("/get", controllers.GetProjects)
 			project.GET("/:id", controllers.GetProjectByID)
-			// project.DELETE("/:id", controllers.DeleteProject)
 		}
 
 		worklog := api.Group("/worklog")
@@ -49,7 +48,6 @@ func ApiRoutes(r *gin.Engine) {
 			worklog.POST("/add", controllers.InsertWorklog)
 			worklog.GET("/get", controllers.GetWorklogs)
 			worklog.GET("/get/user/:user_id", controllers.GetWorklogsByUserId)
-			// worklog.GET("/:id", controllers.GetWorklogByID)
 			worklog.DELETE("/delete/:id", controllers.DeleteWorklog)
 			worklog.GET("/get/user/byproject/:user_id", controllers.GetTotalUserHoursWorkedByProject)
 		}

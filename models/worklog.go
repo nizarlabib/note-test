@@ -93,7 +93,18 @@ func GetWorkLogsByUserID(uid int, limit, offset int) ([]Worklog, error) {
 		Where("user_id = ?", uid).      
 		Limit(limit).                   
 		Offset(offset).
-		Order("work_date DESC").                 
+		Order("work_date ASC").                 
+		Find(&worklogs).Error           
+
+	return worklogs, err
+}
+
+func GetWorkLogsByUserIDNotPaginated(uid int) ([]Worklog, error) {
+	var worklogs []Worklog
+
+	err := config.DB.Preload("Project").Preload("User"). 
+		Where("user_id = ?", uid).      
+		Order("work_date ASC").                 
 		Find(&worklogs).Error           
 
 	return worklogs, err
@@ -126,7 +137,7 @@ func CountUserHoursWorked(uid int) ([]WorklogSummary, error) {
 
 	err := config.DB.
 		Table("worklogs w").
-		Select("p.name as project_name, SUM(w.hours_worked) as hours_worked, SUM(w.hours_worked) / 8 as total_work_days").
+		Select("p.name as project_name, SUM(w.hours_worked) as hours_worked, CAST(SUM(w.hours_worked) AS FLOAT) / 8 as total_work_days").
 		Joins("JOIN projects p ON w.project_id = p.id").
 		Where("w.user_id = ?", uid).
 		Group("p.id, p.name").
@@ -134,5 +145,31 @@ func CountUserHoursWorked(uid int) ([]WorklogSummary, error) {
 
 	return worklogs, err
 }
+
+func GetTotalWorklogsByUserIdAndDate(uid int, date string) (int, error) {
+	var totalHours int
+	err := config.DB.Model(&Worklog{}).
+		Where("user_id = ? AND work_date = ?", uid, date).
+		Select("SUM(hours_worked)").
+		Scan(&totalHours).Error
+	return totalHours, err
+}
+
+type ProjectWorklogSummary struct {
+	TotalHoursWorked float64 `json:"total_hours_worked"`
+	TotalWorkDays float64 `json:"total_work_days"`
+}
+func GetTotalHoursAndDaysWorkedByProject(pid uint) ([]ProjectWorklogSummary, error) {
+	var worklogs []ProjectWorklogSummary
+	err := config.DB.
+		Table("worklogs w").
+		Select("SUM(w.hours_worked) as total_hours_worked, CAST(SUM(w.hours_worked) AS FLOAT) / 8 as total_work_days").
+		Where("w.project_id = ?", pid).
+		Group("w.project_id").
+		Find(&worklogs).Error
+
+	return worklogs, err
+}
+
 
 

@@ -98,6 +98,16 @@ func GetUsers(limit, offset int) ([]User,error) {
 	return users, nil
 }
 
+func GetUsersNotPaginated() ([]User, error) {
+	var users []User
+
+	if err := config.DB.Find(&users).Error; err != nil {
+		return users, errors.New("failed to get users")
+	}
+
+	return users, nil
+}
+
 func CountAllUsers() (int64, error) {
 	var count int64
 

@@ -18,7 +18,7 @@ func GetProjects() ([]Project,error) {
 
 	var projects []Project
 
-	if err := config.DB.Find(&projects).Error; err != nil {
+	if err := config.DB.Order("id ASC").Find(&projects).Error; err != nil {
 		return projects, errors.New("failed to get projects")
 	}
 
