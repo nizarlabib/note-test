@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"strings"
 
-	"sidita-be/utils/helper"
-	"sidita-be/utils/token"
-	"sidita-be/models"
+	"note-test/models"
+	"note-test/utils/helper"
+	"note-test/utils/token"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,16 +28,16 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 		}
 
 		userID, err := token.ExtractTokenID(c)
-	
+
 		if err != nil {
 			helper.SendResponse(c, http.StatusBadRequest, err.Error(), nil)
 			return
 		}
-	
+
 		err = models.CreateLog(&models.Log{
-			EndPoint:  c.FullPath(),
-			Method:    c.Request.Method,
-			UserID:    userID,
+			EndPoint: c.FullPath(),
+			Method:   c.Request.Method,
+			UserID:   userID,
 		})
 		if err != nil {
 			helper.SendResponse(c, http.StatusInternalServerError, "Failed to create log", nil)
@@ -49,18 +49,18 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 }
 
 func CORSMiddleware() gin.HandlerFunc {
-    return func(c *gin.Context) {
+	return func(c *gin.Context) {
 
-        c.Header("Access-Control-Allow-Origin", "*")
-        c.Header("Access-Control-Allow-Credentials", "true")
-        c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-        c.Header("Access-Control-Allow-Methods", "POST,HEAD,PATCH, OPTIONS, GET, PUT, DELETE")
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Credentials", "true")
+		c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Header("Access-Control-Allow-Methods", "POST,HEAD,PATCH, OPTIONS, GET, PUT, DELETE")
 
-        if c.Request.Method == "OPTIONS" {
-            c.AbortWithStatus(204)
-            return
-        }
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
 
-        c.Next()
-    }
+		c.Next()
+	}
 }

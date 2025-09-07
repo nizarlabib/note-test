@@ -1,14 +1,14 @@
 package routes
 
 import (
-	"sidita-be/controllers"
-	"sidita-be/middlewares"
+	"note-test/controllers"
+	"note-test/middlewares"
 
 	"github.com/gin-gonic/gin"
 )
 
 func ApiRoutes(r *gin.Engine) {
-	
+
 	r.Use(middlewares.CORSMiddleware())
 
 	r.GET("/", func(c *gin.Context) {
@@ -16,7 +16,7 @@ func ApiRoutes(r *gin.Engine) {
 			"message": "Welcome",
 		})
 	})
-	
+
 	api := r.Group("/api")
 	{
 		auth := api.Group("/auth")

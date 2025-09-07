@@ -2,19 +2,19 @@ package models
 
 import (
 	"errors"
-	"sidita-be/config"
-	"sidita-be/utils/helper"
+	"note-test/config"
+	"note-test/utils/helper"
 	"time"
 )
 
 type Note struct {
-	ID        	uint      	`gorm:"primaryKey" json:"id"`
-	Title     	string    	`gorm:"size:255;not null" json:"title"`
-	Description string  	`gorm:"size:255;not null" json:"description"`
-	UserID    	uint      	`gorm:"not null" json:"user_id"`
-	User 	  	User      	`gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"-"`
-	CreatedAt 	time.Time 	`gorm:"autoCreateTime" json:"created_at"`
-	UpdatedAt 	time.Time 	`gorm:"autoUpdateTime" json:"updated_at"`
+	ID          uint      `gorm:"primaryKey" json:"id"`
+	Title       string    `gorm:"size:255;not null" json:"title"`
+	Description string    `gorm:"size:255;not null" json:"description"`
+	UserID      uint      `gorm:"not null" json:"user_id"`
+	User        User      `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"-"`
+	CreatedAt   time.Time `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt   time.Time `gorm:"autoUpdateTime" json:"updated_at"`
 }
 
 func CreateNote(n *Note) (*Note, error) {
@@ -44,11 +44,11 @@ func GetAllNote(n *Note, pg *helper.Pagination) error {
 	return nil
 }
 
-func GetNoteByID(id int) (Note,error) {
+func GetNoteByID(id int) (Note, error) {
 
 	var n Note
 
-	if err := config.DB.First(&n,id).Error; err != nil {
+	if err := config.DB.First(&n, id).Error; err != nil {
 		return n, errors.New("note not found")
 	}
 

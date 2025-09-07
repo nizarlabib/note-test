@@ -1,10 +1,12 @@
 package main
 
 import (
-	"sidita-be/config"
-	"sidita-be/routes"
+	"log"
+	"note-test/config"
+	"note-test/models"
+	"note-test/routes"
 
-	_ "sidita-be/docs"
+	_ "note-test/docs"
 
 	"github.com/gin-gonic/gin"
 	// cors "github.com/rs/cors/wrapper/gin"
@@ -21,12 +23,23 @@ import (
 // @name Authorization
 
 func main() {
-
+	// connect DB → assign ke global config.DB
 	config.ConnectDB()
 
-	r := gin.Default()
+	log.Println("Migrating...")
 
-	// r.Use(cors.Default())
+	// pakai global config.DB
+	if err := config.DB.AutoMigrate(
+		&models.User{},
+		&models.Note{},
+		&models.Log{},
+	); err != nil {
+		log.Fatal("Migration failed: ", err)
+	}
+
+	log.Println("Migration completed")
+
+	r := gin.Default()
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
@@ -34,3 +47,4 @@ func main() {
 
 	r.Run(":8080")
 }
+

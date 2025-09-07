@@ -1,18 +1,19 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
+	"note-test/models"
 	"regexp"
-	"sidita-be/models"
 
-	"sidita-be/utils/helper"
-	"sidita-be/utils/token"
+	"note-test/utils/helper"
+	"note-test/utils/token"
 
 	"github.com/gin-gonic/gin"
 )
 
 type LoginInput struct {
-	Email string `json:"email" binding:"required"`
+	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
@@ -27,7 +28,7 @@ type LoginInput struct {
 // @Failure 400 {object} map[string]interface{}
 // @Router /api/auth/login [post]
 func Login(c *gin.Context) {
-	
+
 	var input LoginInput
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -40,17 +41,20 @@ func Login(c *gin.Context) {
 	u.Email = input.Email
 	u.Password = input.Password
 
+	log.Println(u.Email, u.Password)
+
 	token, uid, err := models.LoginCheck(u.Email, u.Password)
 
 	if err != nil {
+		log.Println(err.Error())
 		helper.SendResponse(c, http.StatusBadRequest, "Email or password is incorrect.", nil)
 		return
 	}
 
 	err = models.CreateLog(&models.Log{
-		EndPoint:  c.FullPath(),
-		Method:    c.Request.Method,
-		UserID:    *uid,
+		EndPoint: c.FullPath(),
+		Method:   c.Request.Method,
+		UserID:   uid,
 	})
 	if err != nil {
 		helper.SendResponse(c, http.StatusInternalServerError, "Failed to create log", nil)
@@ -60,14 +64,14 @@ func Login(c *gin.Context) {
 		helper.SendResponse(c, http.StatusInternalServerError, "Failed to create note", nil)
 		return
 	}
-	
-	helper.SendResponse(c, http.StatusOK, "Login success", gin.H{"token":token})
+
+	helper.SendResponse(c, http.StatusOK, "Login success", gin.H{"token": token})
 
 }
 
 type RegisterInput struct {
-	Name string `json:"name" binding:"required"`
-	Email string `json:"email" binding:"required"`
+	Name     string `json:"name" binding:"required"`
+	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
@@ -81,8 +85,8 @@ type RegisterInput struct {
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} map[string]interface{}
 // @Router /api/auth/register [post]
-func Register(c *gin.Context){
-	
+func Register(c *gin.Context) {
+
 	var input RegisterInput
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -104,15 +108,15 @@ func Register(c *gin.Context){
 
 	data, err := u.SaveUser()
 
-	if err != nil{
+	if err != nil {
 		helper.SendResponse(c, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 
 	err = models.CreateLog(&models.Log{
-		EndPoint:  c.FullPath(),
-		Method:    c.Request.Method,
-		UserID:    u.ID,
+		EndPoint: c.FullPath(),
+		Method:   c.Request.Method,
+		UserID:   u.ID,
 	})
 	if err != nil {
 		helper.SendResponse(c, http.StatusInternalServerError, "Failed to create log", nil)
@@ -132,17 +136,17 @@ func Register(c *gin.Context){
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} map[string]interface{}
 // @Router /api/me [get]
-func CurrentUser(c *gin.Context){
+func CurrentUser(c *gin.Context) {
 
 	user_id, err := token.ExtractTokenID(c)
-	
+
 	if err != nil {
 		helper.SendResponse(c, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
-	
-	u,err := models.GetUserByID(int(user_id))
-	
+
+	u, err := models.GetUserByID(int(user_id))
+
 	if err != nil {
 		helper.SendResponse(c, http.StatusBadRequest, err.Error(), nil)
 		return

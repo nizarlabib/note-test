@@ -7,50 +7,46 @@ import (
 	"strings"
 	"time"
 
-	"sidita-be/config"
-	"sidita-be/utils/token"
+	"note-test/config"
+	"note-test/utils/token"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
-	ID       uint   `gorm:"primaryKey" json:"id"`
-	Name     string `gorm:"size:255;not null" json:"name"`
-	Email    string `gorm:"size:255;not null;unique" json:"email"`
-	Password string `gorm:"size:255;not null" json:"-"`
+	ID        uint      `gorm:"primaryKey" json:"id"`
+	Name      string    `gorm:"size:255;not null" json:"name"`
+	Email     string    `gorm:"size:255;not null;unique" json:"email"`
+	Password  string    `gorm:"size:255;not null" json:"-"`
 	CreatedAt time.Time `gorm:"autoCreateTime" json:"-"`
 	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"-"`
 }
 
-func LoginCheck(email string, password string) (*string,*uint,error) {
-	
-	var err error
+func LoginCheck(email, password string) (string, uint, error) {
+	var u User
 
-	u := User{}
+	// Ambil user
+	if err := config.DB.Where("email = ?", email).Take(&u).Error; err != nil {
+		return "", 0, err
+	}
 
-	err = config.DB.Model(User{}).Where("email = ?", email).Take(&u).Error
-
+	// Verifikasi password
+	err := VerifyPassword(password, u.Password)
 	if err != nil {
-		return nil,nil, err
+		return "", 0, err
 	}
 
-	err = VerifyPassword(password, u.Password)
-
-	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		return nil,nil, err
-	}
-
-	token,err := token.GenerateToken(u.ID)
-
+	// Generate token
+	tk, err := token.GenerateToken(u.ID)
 	if err != nil {
-		return nil,nil,err
+		return "", 0, err
 	}
 
-	return &token, &u.ID, nil
-	
+	return tk, u.ID, nil
 }
 
-func VerifyPassword(password,hashedPassword string) error {
+
+func VerifyPassword(password, hashedPassword string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
 
@@ -60,7 +56,7 @@ func (u *User) SaveUser() (*User, error) {
 	if err == nil {
 		return nil, fmt.Errorf("email %s is already registered", u.Email)
 	}
-	
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err
@@ -76,18 +72,18 @@ func (u *User) SaveUser() (*User, error) {
 	return u, nil
 }
 
-func GetUserByID(uid int) (User,error) {
+func GetUserByID(uid int) (User, error) {
 
 	var u User
 
-	if err := config.DB.First(&u,uid).Error; err != nil {
-		return u,errors.New("User not found")
+	if err := config.DB.First(&u, uid).Error; err != nil {
+		return u, errors.New("User not found")
 	}
 
-	return u,nil
+	return u, nil
 }
 
-func GetUsers(limit, offset int) ([]User,error) {
+func GetUsers(limit, offset int) ([]User, error) {
 
 	var users []User
 

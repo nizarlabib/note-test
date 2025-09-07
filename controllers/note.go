@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"net/http"
+	"note-test/models"
+	"note-test/utils/helper"
+	"note-test/utils/token"
 	"strconv"
-	"sidita-be/models"
-	"sidita-be/utils/helper"
-	"sidita-be/utils/token"
 
 	"github.com/gin-gonic/gin"
 )
@@ -43,7 +43,7 @@ func CreateNote(c *gin.Context) {
 		helper.SendResponse(c, http.StatusInternalServerError, "Failed to create note", nil)
 		return
 	}
-	
+
 	helper.SendResponse(c, http.StatusOK, "Note created successfully", note)
 }
 
@@ -61,12 +61,12 @@ func CreateNote(c *gin.Context) {
 // @Failure 500 {object} map[string]interface{}
 // @Router /api/note/get [get]
 func GetAllNote(c *gin.Context) {
-	page, err := strconv.Atoi(c.DefaultQuery("page", "1")) 
+	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
 	if err != nil || page < 1 {
 		page = 1
 	}
 
-	limit, err := strconv.Atoi(c.DefaultQuery("limit", "10")) 
+	limit, err := strconv.Atoi(c.DefaultQuery("limit", "10"))
 	if err != nil {
 		limit = 10
 	}
@@ -97,7 +97,6 @@ func GetAllNote(c *gin.Context) {
 		c.Writer,
 	)
 }
-
 
 // GetNoteByID godoc
 // @Summary Get note by ID
@@ -174,7 +173,7 @@ func UpdateNote(c *gin.Context) {
 		helper.SendResponse(c, http.StatusInternalServerError, "Failed to update note", nil)
 		return
 	}
-	
+
 	helper.SendResponse(c, http.StatusOK, "Note updated successfully", note)
 }
 
@@ -205,7 +204,6 @@ func DeleteNote(c *gin.Context) {
 		helper.SendResponse(c, http.StatusInternalServerError, "Failed to delete note", nil)
 		return
 	}
-	
+
 	helper.SendResponse(c, http.StatusOK, "Note deleted successfully", nil)
 }
-
