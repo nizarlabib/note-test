@@ -22,7 +22,7 @@ type User struct {
 	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"-"`
 }
 
-func LoginCheck(email string, password string) (string,error) {
+func LoginCheck(email string, password string) (*string,*uint,error) {
 	
 	var err error
 
@@ -31,22 +31,22 @@ func LoginCheck(email string, password string) (string,error) {
 	err = config.DB.Model(User{}).Where("email = ?", email).Take(&u).Error
 
 	if err != nil {
-		return "", err
+		return nil,nil, err
 	}
 
 	err = VerifyPassword(password, u.Password)
 
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		return "", err
+		return nil,nil, err
 	}
 
 	token,err := token.GenerateToken(u.ID)
 
 	if err != nil {
-		return "",err
+		return nil,nil,err
 	}
 
-	return token,nil
+	return &token, &u.ID, nil
 	
 }
 

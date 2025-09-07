@@ -22,16 +22,46 @@ definitions:
     - name
     - password
     type: object
-  controllers.WorkLogInput:
+  helper.Page:
     properties:
-      hours_worked:
+      current_page:
         type: integer
-      project_id:
+      limit:
         type: integer
+      total_data:
+        type: integer
+      total_page:
+        type: integer
+    type: object
+  helper.PaginationResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        additionalProperties: true
+        description: Message string                 `json:"message"`
+        type: object
+      error_code:
+        type: string
+      message:
+        type: string
+      page:
+        $ref: '#/definitions/helper.Page'
+    type: object
+  models.Note:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+      updated_at:
+        type: string
       user_id:
         type: integer
-      work_date:
-        type: string
     type: object
 info:
   contact: {}
@@ -118,17 +148,17 @@ paths:
       summary: Current User
       tags:
       - Auth
-  /api/project/{id}:
+  /api/note/{id}:
     get:
       consumes:
       - application/json
-      description: Get Project By ID
+      description: Get a single note by its ID
       parameters:
-      - description: Project ID
+      - description: Note ID
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
@@ -142,16 +172,143 @@ paths:
           schema:
             additionalProperties: true
             type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
       security:
       - BearerAuth: []
-      summary: Get Project By ID
+      summary: Get note by ID
       tags:
-      - Project
-  /api/project/get:
+      - Notes
+  /api/note/add:
+    post:
+      consumes:
+      - application/json
+      description: Create a new note for the authenticated user
+      parameters:
+      - description: Note input
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.Note'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new note
+      tags:
+      - Notes
+  /api/note/delete/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a note by its ID
+      parameters:
+      - description: Note ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete note
+      tags:
+      - Notes
+  /api/note/get:
     get:
       consumes:
       - application/json
-      description: Get Projects
+      description: Get list of notes (paginated) for the authenticated user
+      parameters:
+      - description: Page number (default is 1)
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page (default is 10)
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/helper.PaginationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all notes with pagination
+      tags:
+      - Notes
+  /api/note/update/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update a note by its ID
+      parameters:
+      - description: Note ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated note data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.Note'
       produces:
       - application/json
       responses:
@@ -165,11 +322,21 @@ paths:
           schema:
             additionalProperties: true
             type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
       security:
       - BearerAuth: []
-      summary: Get Projects
+      summary: Update note
       tags:
-      - Project
+      - Notes
   /api/user/{id}:
     get:
       consumes:
@@ -222,215 +389,6 @@ paths:
       summary: Get Users
       tags:
       - User
-  /api/user/get/absent/recap:
-    get:
-      consumes:
-      - application/json
-      description: Get User Absent Recap
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get User Absent Recap
-      tags:
-      - User
-  /api/user/get/absent/recap/byuser/{id}:
-    get:
-      consumes:
-      - application/json
-      description: Get User Absent Recap By User ID
-      parameters:
-      - description: User ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get User Absent Recap By User ID
-      tags:
-      - User
-  /api/worklog/add:
-    post:
-      consumes:
-      - application/json
-      description: Add New Worklog
-      parameters:
-      - description: Input Data
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/controllers.WorkLogInput'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Add Worklog
-      tags:
-      - Worklog
-  /api/worklog/delete/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Delete Worklog
-      parameters:
-      - description: Worklog ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Delete Worklog
-      tags:
-      - Worklog
-  /api/worklog/get:
-    get:
-      consumes:
-      - application/json
-      description: Get Worklogs
-      parameters:
-      - description: Page number
-        in: query
-        name: page
-        type: string
-      - description: Limit
-        in: query
-        name: limit
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get Worklogs
-      tags:
-      - Worklog
-  /api/worklog/get/user/{user_id}:
-    get:
-      consumes:
-      - application/json
-      description: Get Worklogs By User ID
-      parameters:
-      - description: User ID
-        in: path
-        name: user_id
-        required: true
-        type: integer
-      - description: Page number
-        in: query
-        name: page
-        type: string
-      - description: Limit
-        in: query
-        name: limit
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get Worklogs By User ID
-      tags:
-      - Worklog
-  /api/worklog/get/user/byproject/{user_id}:
-    get:
-      consumes:
-      - application/json
-      description: Get Total User Hours Worked By Project
-      parameters:
-      - description: User ID
-        in: path
-        name: user_id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get Total User Hours Worked By Project
-      tags:
-      - Worklog
 securityDefinitions:
   BearerAuth:
     in: header

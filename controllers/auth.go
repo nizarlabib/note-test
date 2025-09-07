@@ -40,10 +40,24 @@ func Login(c *gin.Context) {
 	u.Email = input.Email
 	u.Password = input.Password
 
-	token, err := models.LoginCheck(u.Email, u.Password)
+	token, uid, err := models.LoginCheck(u.Email, u.Password)
 
 	if err != nil {
 		helper.SendResponse(c, http.StatusBadRequest, "Email or password is incorrect.", nil)
+		return
+	}
+
+	err = models.CreateLog(&models.Log{
+		EndPoint:  c.FullPath(),
+		Method:    c.Request.Method,
+		UserID:    *uid,
+	})
+	if err != nil {
+		helper.SendResponse(c, http.StatusInternalServerError, "Failed to create log", nil)
+		return
+	}
+	if err != nil {
+		helper.SendResponse(c, http.StatusInternalServerError, "Failed to create note", nil)
 		return
 	}
 	
@@ -92,6 +106,16 @@ func Register(c *gin.Context){
 
 	if err != nil{
 		helper.SendResponse(c, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+
+	err = models.CreateLog(&models.Log{
+		EndPoint:  c.FullPath(),
+		Method:    c.Request.Method,
+		UserID:    u.ID,
+	})
+	if err != nil {
+		helper.SendResponse(c, http.StatusInternalServerError, "Failed to create log", nil)
 		return
 	}
 

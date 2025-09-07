@@ -6,6 +6,7 @@ import (
 
 	"sidita-be/utils/helper"
 	"sidita-be/utils/token"
+	"sidita-be/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,6 +26,24 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+
+		userID, err := token.ExtractTokenID(c)
+	
+		if err != nil {
+			helper.SendResponse(c, http.StatusBadRequest, err.Error(), nil)
+			return
+		}
+	
+		err = models.CreateLog(&models.Log{
+			EndPoint:  c.FullPath(),
+			Method:    c.Request.Method,
+			UserID:    userID,
+		})
+		if err != nil {
+			helper.SendResponse(c, http.StatusInternalServerError, "Failed to create log", nil)
+			return
+		}
+
 		c.Next()
 	}
 }
